@@ -1,4 +1,4 @@
-/* Background loop, hero early-access form, toast, reveal-on-scroll, parallax and frame spotlight.
+/* Background loop, growing headline, hero early-access form, toast, reveal-on-scroll and parallax.
    The dialogs' forms (beta invite, application, privacy, unsubscribe) live in app.js. */
 (() => {
   'use strict';
@@ -48,6 +48,67 @@
     videos.forEach(v => { if (!v.dataset.ready) return; document.hidden || paused || !canPlay() ? v.pause() : v.play().catch(() => {}); });
   });
 
+  /* ---- Growing headline ----
+     Each letter is a Fraunces glyph whose weight and SOFT axis follow --b (0 to 1).
+     On load the letters sprout in, left to right; afterwards letters near the cursor swell, like leaves turning to the light. */
+  const headline = $('[data-grow]');
+  if (headline) {
+    const text = headline.textContent.replace(/\s+/g, ' ').trim();
+    const sr = document.createElement('span');
+    sr.className = 'sr-only';
+    sr.textContent = text;
+    let index = 0;
+    const letters = [];
+    $$('.hl-line', headline).forEach(line => {
+      const words = line.textContent.trim().split(/\s+/);
+      const count = line.textContent.replace(/\s+/g, '').length;
+      let n = 0;
+      line.textContent = '';
+      line.setAttribute('aria-hidden', 'true');
+      words.forEach((word, wi) => {
+        const w = document.createElement('span');
+        w.className = 'w';
+        for (const c of word) {
+          const ch = document.createElement('span');
+          ch.className = 'ch';
+          ch.textContent = c;
+          ch.style.setProperty('--i', index++);
+          ch.style.setProperty('--t', (n++ / Math.max(1, count - 1)).toFixed(3));
+          w.append(ch);
+          letters.push(ch);
+        }
+        line.append(w);
+        if (wi < words.length - 1) line.append(' ');
+      });
+    });
+    headline.prepend(sr);
+    if (!reduced.matches) headline.classList.add('grow');
+
+    if (finePointer.matches && !reduced.matches) {
+      let raf = 0, x = -1e4, y = -1e4, centres = [];
+      const measure = () => { centres = letters.map(ch => { const r = ch.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }); };
+      const radius = () => Math.max(140, headline.getBoundingClientRect().height * 0.55);
+      const paint = () => {
+        raf = 0;
+        if (!centres.length) measure();
+        const R = radius();
+        letters.forEach((ch, k) => {
+          const d = Math.hypot(centres[k][0] - x, centres[k][1] - y);
+          const b = d >= R ? 0 : Math.pow(1 - d / R, 1.6);
+          ch.style.setProperty('--b', b.toFixed(3));
+        });
+      };
+      const queue = () => { if (!raf) raf = requestAnimationFrame(paint); };
+      const hero = $('.hero');
+      hero.addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; queue(); });
+      hero.addEventListener('pointerleave', () => { x = y = -1e4; queue(); });
+      addEventListener('scroll', () => { centres = []; }, { passive: true });
+      addEventListener('resize', () => { centres = []; });
+      // The parallax shifts the block slightly; re-measure once the entrance has finished.
+      setTimeout(() => { centres = []; }, 2600);
+    }
+  }
+
   /* ---- Toast (shared with app.js through window.dhToast) ---- */
   const toast = $('#toast');
   let toastTimer = 0;
@@ -62,7 +123,7 @@
   /* ---- Hero early-access form: real-time validation, posts to /api/subscribe as a newsletter sign-up ---- */
   const form = $('#subscribe');
   if (form) {
-    const bar = $('.bar', form), email = $('#hero-email', form), consent = $('[name=consent]', form);
+    const bar = $('.line', form), email = $('#hero-email', form), consent = $('[name=consent]', form);
     const validation = $('.validation', form), button = $('button[type=submit]', form), done = $('#hero-done');
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     let touched = false;
@@ -149,13 +210,17 @@
     hero.addEventListener('pointerleave', () => { hero.style.setProperty('--px', 0); hero.style.setProperty('--py', 0); });
   }
 
-  /* ---- Frame spotlight: a soft warm highlight follows the cursor across framed glass ---- */
-  if (finePointer.matches) {
-    $$('.frame').forEach(el => el.addEventListener('pointermove', e => {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      el.style.setProperty('--my', `${e.clientY - r.top}px`);
-    }));
+  /* ---- Bloom: the sun's glow leans a little towards the cursor ---- */
+  if (finePointer.matches && !reduced.matches) {
+    let raf = 0;
+    addEventListener('pointermove', e => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        root.style.setProperty('--bx', (e.clientX / innerWidth - 0.5).toFixed(3));
+        root.style.setProperty('--by', (e.clientY / innerHeight - 0.5).toFixed(3));
+      });
+    }, { passive: true });
   }
 
   /* ---- Header backdrop once the page scrolls ---- */

@@ -25,14 +25,16 @@ Read this first. It records what exists, what was decided, and what is still ope
 
 ## Decisions so far
 - Scripts and styles must be self-hosted: the preview server and production config send a CSP of `script-src 'self'; style-src 'self'`.
-  No Tailwind CDN, no Google Fonts links. Fonts in use: Gambetta (serif display), Switzer (sans), Manrope (logo only).
-  Clash Display / Plus Jakarta Sans were requested but fontshare.com is unreachable from the build environment; add a .woff2 to `site/fonts/` to use one.
+  No Tailwind CDN, no Google Fonts links. Fonts in use: Fraunces (display, variable with opsz/wght/SOFT/WONK axes), Plus Jakarta Sans (text), Manrope (logo only).
+  Both were downloaded from Google Fonts (latin subset) into `site/fonts/` with their OFL licences. Gambetta and Switzer were dropped on 2 October 2026.
 - Video is only loaded on screens 768 px and wider, with reduced-motion off and no data-saver; everyone else gets the poster.
   A visible Pause motion button shows wherever video plays.
 - Forms reuse the backend above; do not invent a new signup store. Consent (18+) is required by the server.
 - No countdown timer (Kam, 2 October 2026). The hero is conversion-only: early-access bar (newsletter via `/api/subscribe`), beta-invite sheet (`#signup-dialog`, beta pre-selected) and join-the-team (`#contribute` then `#apply`).
 - Hero layering: video2 loop, then `.warmth` (amber soft-light undertone), `.scrim` (left-to-right directional, top-to-bottom on phones), `.vignette`, `.bloom` on the sun, `.film-grain`. Text sits on the left over the darkest part of the frame.
-- Box language (Kam asked for less generic boxes, 2 October 2026): `.frame` = frosted pane with an inset passe-partout line, `.ticks` amber corner marks that open out on hover/focus, `.sweep` light travelling the border; small radii and uppercase tracked buttons. Secondary choices and the about pillars are open ruled entries (top hairline that fills amber on hover), not cards. No decorative numbering (N° 01, 01/02/03) or filler tags like "Double opt-in": Kam removed them as generic.
+- No boxes or cards on the page (Kam, 2 October 2026, after two rounds of "too generic"). Type sits straight on the video: the email capture is a single ruled line set in Fraunces, the beta and team links are plain type with growing underlines, the about values are ruled rows. Longer forms open in side drawers (bottom sheets on phones) with underline fields, switches and a lined message box.
+- Signature motion: `site.js` splits the headline into letters; they sprout in on load (weight 100 to 300, SOFT 0 to 50) and swell near the cursor via `--b`. The sun bloom leans towards the cursor. All of it is off under reduced motion.
+- No decorative numbering (N° 01, 01/02/03), uppercase tracked eyebrows, status badges or filler tags like "Double opt-in": Kam removed them as generic. The opening line is friendly sentence case: "Opening soon, and you’re invited."
 - Markup must not use `style=""` attributes (blocked by the CSP); use classes. `site.js` exposes `window.dhToast(text)` for success toasts.
 - Headline (Kam's choice, 2 October 2026): "Grown by the community, for the community." with the supporting line
   "Independent. Moderated. Built on lived experience." Do not use "Out of the haze".
