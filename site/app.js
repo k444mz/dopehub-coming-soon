@@ -3,7 +3,6 @@
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   $('#year').textContent = new Date().getFullYear();
   const openDlg = d => { if (!d.open) d.showModal(); };
   $$('[data-signup]').forEach(b => b.addEventListener('click', () => openDlg($('#signup-dialog'))));
@@ -18,25 +17,30 @@
     e.preventDefault();
     if (a.hasAttribute('data-beta')) $('[name=beta]', sub).checked = true;
     openDlg($('#signup-dialog'));
-    $('#signup').scrollIntoView({ behavior: reduce.matches ? 'instant' : 'smooth', block: 'center' });
     if (!$('#sub-done').classList.contains('show')) email.focus({ preventScroll: true });
     else $('#sub-done').focus({ preventScroll: true });
   }));
-  $$('.botanical img').forEach(img => {
-    const fallback = () => document.documentElement.classList.add('lite');
-    img.addEventListener('error', fallback);
-    if (img.complete && !img.naturalWidth) fallback();
-  });
   const roles = $('#ap-role');
   function hint() { $('#role-hint').textContent = roles.selectedOptions[0]?.dataset.hint || ''; }
   roles.addEventListener('change', hint);
   $$('[data-role]').forEach(b => b.addEventListener('click', () => {
     roles.value = b.dataset.role || ''; hint();
     $('#apply-title').textContent = roles.value ? `Join us: ${roles.selectedOptions[0].textContent}` : b.dataset.area ? `Join us: ${b.dataset.area}` : 'Apply to join';
+    if ($('#contribute').open) $('#contribute').close();
     openDlg($('#apply'));
+    if (!$('#apply-done').classList.contains('show')) $('#ap-name').focus();
   }));
   $$('[data-count-for]').forEach(c => { const input = document.getElementById(c.dataset.countFor); const update = () => c.textContent = `${input.value.length} / ${input.maxLength}`; input.addEventListener('input', update); update(); });
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  // Real-time email validation on dialog fields marked data-live: quiet while typing, clear once valid or on blur.
+  $$('input[data-live]').forEach(input => {
+    const field = input.closest('.field'), note = document.createElement('p');
+    note.className = 'field-msg'; note.id = `${input.id}-msg`; note.setAttribute('aria-live', 'polite');
+    field.append(note); input.setAttribute('aria-describedby', note.id);
+    const set = (state, text = '') => { field.dataset.state = state; note.textContent = text; input.setAttribute('aria-invalid', String(state === 'invalid')); };
+    input.addEventListener('input', () => { const v = input.value.trim(); !v ? set('idle') : emailRe.test(v) ? set('valid', 'Looks good.') : field.dataset.state === 'invalid' ? set('invalid', 'That doesn’t look like an email address yet.') : set('typing'); });
+    input.addEventListener('blur', () => { const v = input.value.trim(); if (v && !emailRe.test(v)) set('invalid', 'That doesn’t look like an email address yet.'); });
+  });
   async function send(url, data) {
     const ctrl = new AbortController(), timeout = setTimeout(() => ctrl.abort(), 12000);
     try { const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data), signal: ctrl.signal });
@@ -44,15 +48,15 @@
       return { ok: res.ok, status: res.status, body };
     } finally { clearTimeout(timeout); }
   }
-  function wire(form, done, url, collect, onOk) {
+  function wire(form, done, url, collect, onOk, toastText) {
     const message = $('.msg', form), button = $('button[type=submit]', form);
     form.addEventListener('submit', async e => {
       e.preventDefault(); if (button.disabled) return;
       message.textContent = ''; const v = collect(new FormData(form));
       if (v.error) { message.textContent = v.error; v.focus?.focus(); return; }
-      const label = button.innerHTML; button.disabled = true; button.textContent = 'Sending…'; form.setAttribute('aria-busy', 'true');
+      const label = button.innerHTML; button.disabled = true; button.innerHTML = '<span>Sending</span><span class="spinner" aria-hidden="true"></span>'; form.setAttribute('aria-busy', 'true');
       try { const r = await send(url, v.data);
-        if (r.ok) { form.hidden = true; done.classList.add('show'); onOk?.(v.data); done.focus(); }
+        if (r.ok) { form.hidden = true; done.classList.add('show'); onOk?.(v.data); done.focus(); window.dhToast?.(toastText); }
         else message.textContent = r.status === 429 ? 'Too many attempts. Please try again in a few minutes.' : (r.body.error || 'We couldn’t save that. Please try again, or email contact@dopehub.net.');
       } catch (_) { message.textContent = 'We couldn’t reach the server. Check your connection and try again.'; }
       finally { button.disabled = false; button.innerHTML = label; form.removeAttribute('aria-busy'); }
@@ -68,7 +72,7 @@
     $('#signup-confirm-detail').textContent = data.beta
       ? (data.newsletter ? 'Your newsletter and beta choices stay separate. ' : '') + 'Confirm your beta request to join the waiting list. Your access invitation comes separately when it’s ready.'
       : 'Confirm your newsletter subscription for occasional updates and launch news. You can unsubscribe at any time.';
-  });
+  }, 'Request received. Confirm from your inbox.');
   wire($('#apply-form'), $('#apply-done'), '/api/apply', fd => {
     const data = Object.fromEntries(fd); for (const k of ['name', 'email', 'link', 'message']) data[k] = (data[k] || '').trim();
     if (!data.name) return { error: 'Please tell us your name.', focus: $('#ap-name') };
@@ -79,9 +83,9 @@
     if (data.message.length < 20) return { error: 'Please tell us a little more about your experience (at least 20 characters).', focus: $('#ap-msg') };
     if (!data.consent) return { error: 'Please confirm you’re 18 or over and agree to the privacy notice.', focus: $('[name=consent]', $('#apply-form')) };
     data.consent = true; return { data };
-  }, data => $('[data-first-name]').textContent = data.name.split(/\s+/)[0]);
+  }, data => $('[data-first-name]').textContent = data.name.split(/\s+/)[0], 'Application sent. Thank you.');
   const banner = $('#banner');
-  function notice(title, text, error = false) { $('b', banner).textContent = title; $('span', banner).textContent = text; banner.classList.toggle('err', error); banner.hidden = false; }
+  function notice(title, text, error = false) { $('div b', banner).textContent = title; $('div span', banner).textContent = text; banner.classList.toggle('err', error); $('use', banner).setAttribute('href', error ? '#i-alert' : '#i-check'); banner.hidden = false; }
   $('button', banner).addEventListener('click', () => banner.hidden = true);
   const qs = new URLSearchParams(location.search), confirm = qs.get('confirm'), unsubscribe = qs.get('unsubscribe');
   // Keep tokens in the address until the operation succeeds, so a failed connection can be retried.

@@ -1,4 +1,4 @@
-/* Background loop, countdown, hero subscribe bar, reveal-on-scroll and parallax.
+/* Background loop, hero early-access form, toast, reveal-on-scroll, parallax and glass spotlight.
    The dialogs' forms (beta invite, application, privacy, unsubscribe) live in app.js. */
 (() => {
   'use strict';
@@ -7,6 +7,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const wide = matchMedia('(min-width: 768px)');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
   const videos = $$('video[data-webm]');
   let paused = false;
 
@@ -23,7 +24,7 @@
     }
     video.addEventListener('playing', () => video.classList.add('is-playing'), { once: true });
     video.load();
-    video.play().catch(() => {});
+    if (!paused) video.play().catch(() => {});
   }
   const toggle = $('[data-motion-toggle]');
   function setPaused(next) {
@@ -36,67 +37,87 @@
     videos.forEach(v => { if (v.dataset.ready) paused ? v.pause() : v.play().catch(() => {}); });
   }
   if (toggle) toggle.addEventListener('click', () => setPaused(!paused));
-  const syncAvailability = () => { if (toggle) toggle.hidden = !canPlay(); videos.forEach(attach); };
+  const syncAvailability = () => {
+    if (toggle) toggle.hidden = !canPlay();
+    videos.forEach(v => { attach(v); if (v.dataset.ready && !canPlay()) v.pause(); });
+  };
   wide.addEventListener('change', syncAvailability);
   reduced.addEventListener('change', syncAvailability);
   syncAvailability();
   document.addEventListener('visibilitychange', () => {
-    videos.forEach(v => { if (!v.dataset.ready) return; document.hidden || paused ? v.pause() : v.play().catch(() => {}); });
+    videos.forEach(v => { if (!v.dataset.ready) return; document.hidden || paused || !canPlay() ? v.pause() : v.play().catch(() => {}); });
   });
 
-  /* ---- Countdown ---- */
-  const countdown = $('.countdown');
-  if (countdown) {
-    const launch = Date.parse(countdown.dataset.launch);
-    const parts = { days: $('[data-days]', countdown), hours: $('[data-hours]', countdown), mins: $('[data-mins]', countdown), secs: $('[data-secs]', countdown) };
-    const pad = n => String(n).padStart(2, '0');
-    const tick = () => {
-      let left = Math.max(0, launch - Date.now());
-      const days = Math.floor(left / 864e5); left -= days * 864e5;
-      const hours = Math.floor(left / 36e5); left -= hours * 36e5;
-      const mins = Math.floor(left / 6e4); left -= mins * 6e4;
-      parts.days.textContent = pad(days); parts.hours.textContent = pad(hours);
-      parts.mins.textContent = pad(mins); parts.secs.textContent = pad(Math.floor(left / 1e3));
-      countdown.classList.toggle('is-live', launch <= Date.now());
-    };
-    if (Number.isFinite(launch)) { tick(); setInterval(tick, 1000); }
-    else countdown.hidden = true;
-  }
+  /* ---- Toast (shared with app.js through window.dhToast) ---- */
+  const toast = $('#toast');
+  let toastTimer = 0;
+  window.dhToast = text => {
+    if (!toast) return;
+    $('[data-toast-text]', toast).textContent = text;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4200);
+  };
 
-  /* ---- Hero subscribe bar: instant validation, posts to the same /api/subscribe as the dialog ---- */
+  /* ---- Hero early-access form: real-time validation, posts to /api/subscribe as a newsletter sign-up ---- */
   const form = $('#subscribe');
   if (form) {
     const bar = $('.bar', form), email = $('#hero-email', form), consent = $('[name=consent]', form);
     const validation = $('.validation', form), button = $('button[type=submit]', form), done = $('#hero-done');
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    const state = (name, text = '', ok = false) => { bar.dataset.state = name; validation.textContent = text; validation.classList.toggle('ok', ok); };
+    let touched = false;
+    const state = (name, text = '', ok = false) => {
+      bar.dataset.state = name;
+      validation.textContent = text;
+      validation.classList.toggle('ok', ok);
+      email.setAttribute('aria-invalid', String(name === 'invalid'));
+      if (name === 'invalid') { bar.classList.remove('shake'); void bar.offsetWidth; bar.classList.add('shake'); }
+    };
     email.addEventListener('input', () => {
       const v = email.value.trim();
       if (!v) return state('idle');
-      emailRe.test(v) ? state('valid', 'Looks good.', true) : state('typing');
+      if (emailRe.test(v)) state('valid', 'Looks good.', true);
+      else if (touched) state('typing', 'Keep going: an address looks like name@example.com.');
+      else state('typing');
     });
     email.addEventListener('blur', () => {
       const v = email.value.trim();
-      if (v && !emailRe.test(v)) state('invalid', 'That doesn’t look like an email address.');
+      if (v) touched = true;
+      if (v && !emailRe.test(v)) state('invalid', 'That doesn’t look like an email address yet.');
     });
+    consent.addEventListener('change', () => {
+      $('.check', form).classList.remove('attention');
+      if (consent.checked && bar.dataset.state === 'invalid' && emailRe.test(email.value.trim())) state('valid', 'Looks good.', true);
+    });
+    $$('[data-focus-hero]').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      form.scrollIntoView({ behavior: reduced.matches ? 'instant' : 'smooth', block: 'center' });
+      (form.classList.contains('is-done') ? done : email).focus({ preventScroll: true });
+    }));
     form.addEventListener('submit', async e => {
       e.preventDefault();
       if (button.disabled) return;
       const address = email.value.trim();
-      if (!emailRe.test(address)) { state('invalid', 'Please enter a valid email address.'); email.focus(); return; }
-      if (!consent.checked) { state('invalid', 'Please confirm you’re 18 or over and happy to receive launch emails.'); consent.focus(); return; }
+      touched = true;
+      if (!emailRe.test(address)) { state('invalid', address ? 'Please enter a valid email address.' : 'Enter your email address to get early access.'); email.focus(); return; }
+      if (!consent.checked) { state('invalid', 'Please confirm you’re 18 or over and happy to receive launch emails.'); $('.check', form).classList.add('attention'); consent.focus(); return; }
       const label = button.innerHTML;
-      button.disabled = true; button.textContent = 'Sending…'; form.setAttribute('aria-busy', 'true');
+      button.disabled = true;
+      button.innerHTML = '<span>Sending</span><span class="spinner" aria-hidden="true"></span>';
+      form.setAttribute('aria-busy', 'true');
+      const ctrl = new AbortController(), timeout = setTimeout(() => ctrl.abort(), 12000);
       try {
-        const ctrl = new AbortController(), timeout = setTimeout(() => ctrl.abort(), 12000);
         const res = await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal,
           body: JSON.stringify({ email: address, newsletter: true, beta: false, consent: true, website: $('[name=website]', form).value || '' }) });
-        clearTimeout(timeout);
         let body = {}; try { body = await res.json(); } catch (_) {}
-        if (res.ok) { form.classList.add('is-done'); done.classList.add('show'); done.focus(); }
-        else state('invalid', res.status === 429 ? 'Too many attempts. Please try again in a few minutes.' : (body.error || 'We couldn’t save that. Please try again, or email contact@dopehub.net.'));
+        if (res.ok) {
+          $('[data-hero-address]', done).textContent = address;
+          form.classList.add('is-done');
+          done.focus();
+          window.dhToast('You’re nearly in. Confirm from your inbox.');
+        } else state('invalid', res.status === 429 ? 'Too many attempts. Please try again in a few minutes.' : (body.error || 'We couldn’t save that. Please try again, or email contact@dopehub.net.'));
       } catch (_) { state('invalid', 'We couldn’t reach the server. Check your connection and try again.'); }
-      finally { button.disabled = false; button.innerHTML = label; form.removeAttribute('aria-busy'); }
+      finally { clearTimeout(timeout); button.disabled = false; button.innerHTML = label; form.removeAttribute('aria-busy'); }
     });
   }
 
@@ -109,12 +130,12 @@
       entries.forEach(e => { if (e.isIntersecting) { show(e.target); io.unobserve(e.target); } });
     }, { threshold: 0.15 });
     reveals.forEach(el => { if (el.getBoundingClientRect().top > innerHeight) { el.classList.add('pending'); io.observe(el); } });
-    setTimeout(() => reveals.forEach(show), 5000);
+    setTimeout(() => reveals.forEach(show), 6000);
   }
 
-  /* ---- Mouse parallax: the foreground drifts a few pixels against the cursor ---- */
+  /* ---- Mouse parallax (guide 2): the foreground drifts 5 to 10 px against the cursor ---- */
   const hero = $('.hero');
-  if (hero && matchMedia('(hover: hover) and (pointer: fine)').matches && !reduced.matches) {
+  if (hero && finePointer.matches && !reduced.matches) {
     let frame = 0;
     hero.addEventListener('pointermove', e => {
       if (frame) return;
@@ -125,6 +146,16 @@
         hero.style.setProperty('--py', ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
       });
     });
+    hero.addEventListener('pointerleave', () => { hero.style.setProperty('--px', 0); hero.style.setProperty('--py', 0); });
+  }
+
+  /* ---- Glass spotlight: a soft warm highlight follows the cursor across glass surfaces ---- */
+  if (finePointer.matches) {
+    $$('.glow').forEach(el => el.addEventListener('pointermove', e => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }));
   }
 
   /* ---- Header backdrop once the page scrolls ---- */

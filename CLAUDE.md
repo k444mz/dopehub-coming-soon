@@ -30,7 +30,9 @@ Read this first. It records what exists, what was decided, and what is still ope
 - Video is only loaded on screens 768 px and wider, with reduced-motion off and no data-saver; everyone else gets the poster.
   A visible Pause motion button shows wherever video plays.
 - Forms reuse the backend above; do not invent a new signup store. Consent (18+) is required by the server.
-- The countdown's launch moment is `data-launch` on `.countdown` in `site/index.html`; it is a placeholder (1 Dec 2026 09:00 UTC) until Kam gives the real date.
+- No countdown timer (Kam, 2 October 2026). The hero is conversion-only: early-access bar (newsletter via `/api/subscribe`), beta-invite sheet (`#signup-dialog`, beta pre-selected) and join-the-team (`#contribute` then `#apply`).
+- Hero layering: video2 loop, then `.warmth` (amber soft-light undertone), `.scrim` (left-to-right directional, top-to-bottom on phones), `.vignette`, `.bloom` on the sun, `.film-grain`. Text sits on the left over the darkest part of the frame.
+- Markup must not use `style=""` attributes (blocked by the CSP); use classes. `site.js` exposes `window.dhToast(text)` for success toasts.
 - Headline (Kam's choice, 2 October 2026): "Grown by the community, for the community." with the supporting line
   "Independent. Moderated. Built on lived experience." Do not use "Out of the haze".
 - Community-first wording: members, community, lived experience. Never "patients" except as the precise medical/legal term.
