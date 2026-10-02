@@ -1,0 +1,3 @@
+#!/bin/sh
+# Admin helper: dopehub-signups stats | export subscribers|applications|survey | forget <email> | outbox | retry | send-test <email>
+exec sudo bash -c 'set -a; . /etc/dopehub-signup/env; set +a; export SIGNUP_DB=/var/lib/dopehub-signup/signups.db; exec runuser -u dopehub-signup -- /usr/bin/python3 /opt/dopehub-signup/signup_service.py "$@"' _ "$@"

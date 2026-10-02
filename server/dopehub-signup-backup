@@ -1,0 +1,39 @@
+#!/bin/bash
+# Nightly backup of the dopehub.net sign-up database (cron: /etc/cron.d/dopehub-signup-backup, 03:45 UK time).
+# - Consistent snapshot while the service runs (SQLite online backup API), gzipped, with a SHA256 file
+# - Kept 30 days in /var/backups/dopehub-signup (readable by the ubuntu account, for download to the PC)
+# - Uploaded to the private Oracle bucket dopehub-backups under signups/ via the write-only link in
+#   /etc/dopehub-signup/backup-env (OBJECT_STORAGE_PAR=...)
+set -euo pipefail
+DB=/var/lib/dopehub-signup/signups.db
+DIR=/var/backups/dopehub-signup
+KEEP_DAYS=30
+STAMP=$(date +%Y%m%d-%H%M)
+NAME=signups-$STAMP.db.gz
+umask 077
+install -d -m 750 -o root -g ubuntu "$DIR"
+TMP=$(mktemp)
+trap 'rm -f "$TMP"' EXIT
+python3 - "$DB" "$TMP" <<'PY'
+import sqlite3, sys
+src = sqlite3.connect(f"file:{sys.argv[1]}?mode=ro", uri=True)
+dst = sqlite3.connect(sys.argv[2])
+src.backup(dst)
+ok = dst.execute("PRAGMA integrity_check").fetchone()[0]
+dst.close(); src.close()
+if ok != "ok":
+    sys.exit(f"integrity check failed: {ok}")
+PY
+gzip -9 -c "$TMP" > "$DIR/$NAME"
+(cd "$DIR" && sha256sum "$NAME" > "$NAME.sha256")
+chgrp ubuntu "$DIR/$NAME" "$DIR/$NAME.sha256" && chmod 640 "$DIR/$NAME" "$DIR/$NAME.sha256"
+find "$DIR" -name 'signups-*' -mtime +$KEEP_DAYS -delete
+if [ -f /etc/dopehub-signup/backup-env ]; then
+  . /etc/dopehub-signup/backup-env
+  for f in "$NAME" "$NAME.sha256"; do
+    curl -sf -T "$DIR/$f" "${OBJECT_STORAGE_PAR%/}/signups/$f" > /dev/null
+  done
+  echo "$(date -Is) $NAME uploaded"
+else
+  echo "$(date -Is) $NAME saved locally (no backup-env, not uploaded)"
+fi

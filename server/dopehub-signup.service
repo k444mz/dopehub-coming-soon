@@ -1,0 +1,35 @@
+[Unit]
+Description=DopeHub.net sign-up service (updates list, team applications, stats)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=dopehub-signup
+Group=dopehub-signup
+EnvironmentFile=/etc/dopehub-signup/env
+Environment=SIGNUP_DB=/var/lib/dopehub-signup/signups.db
+Environment=SIGNUP_PORT=8081
+ExecStart=/usr/bin/python3 /opt/dopehub-signup/signup_service.py
+Restart=on-failure
+RestartSec=3
+StateDirectory=dopehub-signup
+StateDirectoryMode=0700
+UMask=0077
+MemoryMax=96M
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

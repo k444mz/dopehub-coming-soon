@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>DopeHub admin</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/admin/"><img src="/logo.png" alt="" width="30" height="30"><span>DopeHub<b>.net</b></span><em>admin</em></a>
+    <div class="top-actions"><span class="updated" id="updated"></span><button class="btn ghost" id="refresh" type="button">Refresh</button><a class="btn ghost" href="/" target="_blank" rel="noopener">View site</a></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="alerts"></div>
+
+  <section class="tiles" aria-label="Key numbers">
+    <div class="tile"><span class="lbl">Subscribers</span><b id="t-subs">–</b><small id="t-subs-sub"></small></div>
+    <div class="tile"><span class="lbl">New applications</span><b id="t-apps">–</b><small id="t-apps-sub"></small></div>
+    <div class="tile"><span class="lbl">Visitors, last 30 days</span><b id="t-vis">–</b><small id="t-vis-sub"></small></div>
+    <div class="tile"><span class="lbl">Sign-up rate, last 30 days</span><b id="t-conv">–</b><small>sign-ups ÷ visitors</small></div>
+  </section>
+
+  <section class="grid2">
+    <div class="panel"><h2>Visitors per day <small>last 60 days</small></h2><div class="chart" id="c-visitors"></div></div>
+    <div class="panel"><h2>Sign-ups per day <small>last 60 days</small></h2><div class="chart" id="c-subs"></div></div>
+  </section>
+
+  <section class="grid3">
+    <div class="panel"><h2>What would help most <small id="sv-n"></small></h2><div class="hbars" id="c-survey"></div><div id="sv-other"></div></div>
+    <div class="panel"><h2>Who's signing up</h2><div class="hbars" id="c-who"></div></div>
+    <div class="panel"><h2>Where visitors come from <small>30 days</small></h2><div class="hbars" id="c-ref"></div><h3>Devices</h3><div class="hbars" id="c-dev"></div></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Team applications <small id="apps-n"></small></h2>
+      <div class="filters" role="group" aria-label="Filter applications">
+        <select id="f-status" aria-label="Status"><option value="">All statuses</option></select>
+        <select id="f-role" aria-label="Role"><option value="">All roles</option></select>
+      </div>
+    </div>
+    <div id="apps"></div>
+  </section>
+
+  <section class="grid2">
+    <div class="panel">
+      <h2>Download</h2>
+      <p class="muted">Spreadsheet (CSV) files you can open in Excel or Google Sheets.</p>
+      <div class="dl">
+        <a class="btn" href="/admin/api/export/subscribers.csv">Subscribers</a>
+        <a class="btn" href="/admin/api/export/applications.csv">Applications</a>
+        <a class="btn" href="/admin/api/export/survey.csv">Survey answers</a>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Delete someone's data</h2>
+      <p class="muted">For "please delete my details" requests. Removes their subscription, survey answer and applications.</p>
+      <form id="forget" class="forget"><input type="email" required placeholder="their@email.com" aria-label="Email address"><button class="btn danger" type="submit">Delete</button></form>
+      <p class="msg" id="forget-msg" role="status"></p>
+    </div>
+  </section>
+</main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<script src="/admin/admin.js" defer></script>
+</body>
+</html>
