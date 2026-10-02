@@ -31,6 +31,8 @@ Read this first. It records what exists, what was decided, and what is still ope
   A visible Pause motion button shows wherever video plays.
 - Forms reuse the backend above; do not invent a new signup store. Consent (18+) is required by the server.
 - The countdown's launch moment is `data-launch` on `.countdown` in `site/index.html`; it is a placeholder (1 Dec 2026 09:00 UTC) until Kam gives the real date.
+- Headline (Kam's choice, 2 October 2026): "Grown by the community, for the community." with the supporting line
+  "Independent. Moderated. Built on lived experience." Do not use "Out of the haze".
 - Community-first wording: members, community, lived experience. Never "patients" except as the precise medical/legal term.
   No prices, sellers, stock or purchase links. Not medical advice. UK, 18+.
 - Commits use Kam's identity; no assistant credit lines in the repo.
