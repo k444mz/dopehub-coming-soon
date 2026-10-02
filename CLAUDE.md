@@ -32,6 +32,7 @@ Read this first. It records what exists, what was decided, and what is still ope
 - Forms reuse the backend above; do not invent a new signup store. Consent (18+) is required by the server.
 - No countdown timer (Kam, 2 October 2026). The hero is conversion-only: early-access bar (newsletter via `/api/subscribe`), beta-invite sheet (`#signup-dialog`, beta pre-selected) and join-the-team (`#contribute` then `#apply`).
 - Hero layering: video2 loop, then `.warmth` (amber soft-light undertone), `.scrim` (left-to-right directional, top-to-bottom on phones), `.vignette`, `.bloom` on the sun, `.film-grain`. Text sits on the left over the darkest part of the frame.
+- Box language (Kam asked for less generic boxes, 2 October 2026): `.frame` = frosted pane with an inset passe-partout line, `.ticks` amber corner marks that open out on hover/focus, `.sweep` light travelling the border; small radii and uppercase tracked buttons. Secondary choices and the about pillars are open ruled entries (top hairline that fills amber on hover, `N° 0x` serif numbering), not cards.
 - Markup must not use `style=""` attributes (blocked by the CSP); use classes. `site.js` exposes `window.dhToast(text)` for success toasts.
 - Headline (Kam's choice, 2 October 2026): "Grown by the community, for the community." with the supporting line
   "Independent. Moderated. Built on lived experience." Do not use "Out of the haze".

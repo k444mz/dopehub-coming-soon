@@ -1,4 +1,4 @@
-/* Background loop, hero early-access form, toast, reveal-on-scroll, parallax and glass spotlight.
+/* Background loop, hero early-access form, toast, reveal-on-scroll, parallax and frame spotlight.
    The dialogs' forms (beta invite, application, privacy, unsubscribe) live in app.js. */
 (() => {
   'use strict';
@@ -149,9 +149,9 @@
     hero.addEventListener('pointerleave', () => { hero.style.setProperty('--px', 0); hero.style.setProperty('--py', 0); });
   }
 
-  /* ---- Glass spotlight: a soft warm highlight follows the cursor across glass surfaces ---- */
+  /* ---- Frame spotlight: a soft warm highlight follows the cursor across framed glass ---- */
   if (finePointer.matches) {
-    $$('.glow').forEach(el => el.addEventListener('pointermove', e => {
+    $$('.frame').forEach(el => el.addEventListener('pointermove', e => {
       const r = el.getBoundingClientRect();
       el.style.setProperty('--mx', `${e.clientX - r.left}px`);
       el.style.setProperty('--my', `${e.clientY - r.top}px`);
