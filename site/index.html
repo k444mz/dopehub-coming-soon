@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DopeHub — Out of the haze. Into good company.</title>
-<meta name="description" content="An independent UK community for people using or considering prescribed medical cannabis. Real experiences, plain-English guides and a moderated place to ask. Opening soon.">
+<title>DopeHub.net — Coming soon. Out of the haze, into good company.</title>
+<meta name="description" content="DopeHub.net is an independent UK community for people using or considering prescribed medical cannabis. Subscribe for early access, request a beta invite or join the team.">
 <link rel="canonical" href="https://dopehub.net/">
-<meta name="theme-color" content="#070d0a">
+<meta name="theme-color" content="#0a0906">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DopeHub">
-<meta property="og:title" content="DopeHub — Out of the haze. Into good company.">
-<meta property="og:description" content="An independent UK community for people using or considering prescribed medical cannabis. Opening soon.">
+<meta property="og:title" content="DopeHub.net — Coming soon">
+<meta property="og:description" content="An independent UK community for people using or considering prescribed medical cannabis. Early access opens soon.">
 <meta property="og:url" content="https://dopehub.net/">
 <meta property="og:image" content="https://dopehub.net/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -28,75 +28,78 @@
 <a class="skip" href="#main">Skip to content</a>
 <div class="film-grain" aria-hidden="true"></div>
 
+<!-- Layer 1: background loop. Phones, reduced-motion and data-saver visitors see the poster only. -->
+<div class="bg" aria-hidden="true">
+  <video class="bg-video" muted loop playsinline preload="auto" tabindex="-1" disablepictureinpicture disableremoteplayback poster="/media/loops/hero-sunset-poster.webp" data-eager="1" data-webm="/media/loops/hero-sunset.webm" data-mp4="/media/loops/hero-sunset.mp4"></video>
+  <!-- Layer 2: amber warmth, vignette and a slow lens flare sitting on the sun -->
+  <div class="scrim"></div>
+  <div class="vignette"></div>
+  <div class="flare"></div>
+</div>
+
 <header class="nav" id="nav">
   <a class="wordmark" href="#top" aria-label="DopeHub.net, home"><img src="/media/logo-mark.png" width="28" height="32" alt=""><span>Dope<b>Hub</b><small>.net</small></span></a>
   <nav class="nav-links" aria-label="Main navigation">
-    <a href="#vision">The vision</a>
-    <button type="button" data-contribute>Help us build it</button>
+    <button type="button" class="nav-link" data-beta>Beta invite</button>
+    <button type="button" class="nav-link" data-contribute>Join the team</button>
   </nav>
-  <button class="btn primary small" type="button" data-signup>Get early access <span aria-hidden="true">↗</span></button>
+  <a class="btn primary small" href="#subscribe">Early access <span aria-hidden="true">↗</span></a>
 </header>
 
 <main id="main">
   <section class="hero" aria-labelledby="headline">
-    <div class="bg bg-hero" aria-hidden="true">
-      <video class="bg-video" muted loop playsinline preload="auto" tabindex="-1" disablepictureinpicture disableremoteplayback poster="/media/loops/hero-sunset-poster.webp" data-eager="1" data-webm="/media/loops/hero-sunset.webm" data-mp4="/media/loops/hero-sunset.mp4"></video>
-    </div>
-    <div class="scrim" aria-hidden="true"></div>
     <div class="hero-content">
-      <p class="status eyebrow"><span class="dot" aria-hidden="true"></span>A new community is taking root</p>
-      <h1 id="headline">Out of<br>the <em>haze.</em></h1>
-      <p class="lead">Into good company.</p>
-      <p class="sub">A new home for the UK medical cannabis community. Real voices, shared knowledge and a little more clarity.</p>
-      <div class="hero-actions">
-        <button class="btn primary" type="button" data-signup>Be here from the beginning <span aria-hidden="true">↗</span></button>
-        <button class="btn ghost" type="button" data-contribute>Help us build it</button>
+      <p class="status"><span class="dot" aria-hidden="true"></span>Private beta opens soon · UK · 18+</p>
+      <h1 id="headline"><span class="brand">DopeHub<em>.net</em></span><span class="tagline">Out of the haze.<br>Into good company.</span></h1>
+      <p class="sub">An independent home for the UK medical cannabis community. Real voices, plain-English guides and a moderated place to ask what you’ve been wondering.</p>
+
+      <!-- Live countdown. Change data-launch to the real launch moment (ISO 8601, UTC). -->
+      <div class="countdown" data-launch="2026-12-01T09:00:00Z" role="timer" aria-label="Time until launch">
+        <div class="tile"><b data-days>00</b><span>Days</span></div>
+        <div class="tile"><b data-hours>00</b><span>Hours</span></div>
+        <div class="tile"><b data-mins>00</b><span>Minutes</span></div>
+        <div class="tile"><b data-secs>00</b><span>Seconds</span></div>
+      </div>
+
+      <!-- Primary action: newsletter subscription straight from the hero -->
+      <form id="subscribe" class="subscribe glass" novalidate aria-describedby="subscribe-note">
+        <label class="sr-only" for="hero-email">Your email address</label>
+        <div class="bar" data-state="idle">
+          <span class="bar-icon" aria-hidden="true">✉</span>
+          <input id="hero-email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" placeholder="you@example.com" maxlength="254" required>
+          <button class="btn primary" type="submit"><span>Subscribe for early access</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <p class="validation" aria-live="polite"></p>
+        <label class="check">
+          <input type="checkbox" name="consent" value="1">
+          <span>I’m 18 or over and agree to occasional launch emails. <button type="button" class="link" data-privacy>Privacy notice</button></span>
+        </label>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p id="subscribe-note" class="note">Confirm by email. Unsubscribe any time. No spam, no selling your details.</p>
+        <div class="done" id="hero-done" tabindex="-1" role="status"><span class="success-mark" aria-hidden="true">✓</span><b>Check your inbox.</b><span>We’ve sent a confirmation link. Tap it and you’re on the list.</span></div>
+      </form>
+
+      <div class="secondary">
+        <button type="button" class="chip" data-beta><span class="chip-icon" aria-hidden="true">◈</span><span><b>Request a beta invite</b><small>Help test and shape the platform</small></span><span class="chip-arrow" aria-hidden="true">→</span></button>
+        <button type="button" class="chip" data-contribute><span class="chip-icon" aria-hidden="true">✳</span><span><b>Join the team</b><small>Volunteer roles, flexible around your life</small></span><span class="chip-arrow" aria-hidden="true">→</span></button>
       </div>
     </div>
+
     <div class="hero-foot">
-      <a class="scroll-cue" href="#vision"><i aria-hidden="true"></i><span>Opening soon · UK · 18+</span></a>
+      <a class="scroll-cue" href="#about"><i aria-hidden="true"></i><span>What’s growing</span></a>
       <button class="motion-toggle" type="button" aria-pressed="false" data-motion-toggle hidden><span aria-hidden="true">Ⅱ</span><span data-label>Pause motion</span></button>
     </div>
   </section>
 
-  <div class="strip" aria-label="Rooted in experience. Growing through connection. Independent by nature.">
-    <div class="strip-track" aria-hidden="true">
-      <span>Rooted in experience</span><i>✳</i><span>Growing through connection</span><i>✳</i><span>Independent by nature</span><i>✳</i>
-      <span>Rooted in experience</span><i>✳</i><span>Growing through connection</span><i>✳</i><span>Independent by nature</span><i>✳</i>
+  <section class="about" id="about" aria-labelledby="about-title">
+    <div class="about-head reveal">
+      <p class="eyebrow">What’s growing</p>
+      <h2 id="about-title">Less noise. More <em>understanding.</em></h2>
     </div>
-  </div>
-
-  <section class="panel panel-community" id="vision" aria-labelledby="vision-title">
-    <div class="bg bg-community" aria-hidden="true">
-      <video class="bg-video" muted loop playsinline preload="none" tabindex="-1" disablepictureinpicture disableremoteplayback poster="/media/loops/community-forest-poster.webp" data-webm="/media/loops/community-forest.webm" data-mp4="/media/loops/community-forest.mp4"></video>
-    </div>
-    <div class="scrim" aria-hidden="true"></div>
-    <div class="section-head reveal">
-      <p class="eyebrow">The vision</p>
-      <h2 id="vision-title">Less noise.<br>More <em>understanding.</em></h2>
-      <p class="intro">Finding your way with medical cannabis can feel complicated. Finding your people shouldn’t.</p>
-    </div>
-    <div class="principles">
-      <article class="principle reveal"><span class="n">01</span><h3>Real people. Real experiences.</h3><p>Honest conversations with people who understand the questions, the uncertainty and the everyday realities.</p></article>
-      <article class="principle reveal"><span class="n">02</span><h3>A clearer way forward.</h3><p>Plain-English guides and carefully considered information. A place to start, and a place to keep learning.</p></article>
-      <article class="principle reveal"><span class="n">03</span><h3>Somewhere you can belong.</h3><p>A thoughtful, moderated community for people using or considering prescribed medical cannabis. Room for your questions. Respect for your experience.</p></article>
-    </div>
-  </section>
-
-  <section class="panel panel-join" id="join" aria-labelledby="join-title">
-    <div class="bg bg-join" aria-hidden="true">
-      <video class="bg-video" muted loop playsinline preload="none" tabindex="-1" disablepictureinpicture disableremoteplayback poster="/media/loops/join-golden-hour-poster.webp" data-webm="/media/loops/join-golden-hour.webm" data-mp4="/media/loops/join-golden-hour.mp4"></video>
-    </div>
-    <div class="scrim" aria-hidden="true"></div>
-    <div class="join-copy reveal">
-      <p class="eyebrow">Grow with us</p>
-      <h2 id="join-title">Good things<br>grow <em>together.</em></h2>
-      <p>Come for the clarity. Stay for the community. Be part of DopeHub from day one.</p>
-      <div class="invite">
-        <span class="badge"><i aria-hidden="true"></i>Early access · UK · 18+</span>
-        <button class="btn primary" type="button" data-signup>Keep me in the loop <span aria-hidden="true">↗</span></button>
-        <button class="text-link alt" type="button" data-contribute>Have something to bring? Help us build it</button>
-      </div>
+    <div class="features">
+      <article class="glass card reveal"><span class="card-mark" aria-hidden="true">01</span><h3>Real people. Real experiences.</h3><p>Honest conversations with people who understand the questions, the uncertainty and the everyday realities.</p></article>
+      <article class="glass card reveal"><span class="card-mark" aria-hidden="true">02</span><h3>A clearer way forward.</h3><p>Plain-English guides and carefully considered information. A place to start, and a place to keep learning.</p></article>
+      <article class="glass card reveal"><span class="card-mark" aria-hidden="true">03</span><h3>Somewhere you can belong.</h3><p>A thoughtful, moderated community for people using or considering prescribed medical cannabis.</p></article>
     </div>
   </section>
 </main>
@@ -112,33 +115,38 @@
   </div>
 </footer>
 
-<dialog id="signup-dialog" class="dlg signup-dialog" aria-labelledby="signup-title"><div class="dlg-head"><div><p class="eyebrow">GROWING TOGETHER</p><h2 id="signup-title">Be here from the beginning.</h2></div><button class="dlg-close" type="button" aria-label="Close" data-close>×</button></div><div class="dlg-body">
+<!-- ============ DIALOG: Beta invite (the full preferences form; beta is pre-selected) ============ -->
+<dialog id="signup-dialog" class="dlg signup-dialog" aria-labelledby="signup-title"><div class="dlg-head"><div><p class="eyebrow">Private beta</p><h2 id="signup-title">Request a beta invite.</h2></div><button class="dlg-close" type="button" aria-label="Close" data-close>×</button></div><div class="dlg-body">
    <div class="signup" id="signup">
     <form id="early-access" class="form" novalidate aria-describedby="signup-note">
-     <fieldset class="preferences"><legend>Choose how you’d like to join us.</legend>
-      <label class="preference"><input type="checkbox" name="newsletter" value="1"><span><b>Get the newsletter</b><small>Occasional updates & launch news</small></span></label>
-      <label class="preference"><input type="checkbox" name="beta" value="1"><span><b>Request a beta invitation</b><small>Help test & shape the platform</small></span></label>
+     <p class="intro">Beta places are limited and invitations go out in waves. Choose what you’d like to hear about.</p>
+     <fieldset class="preferences"><legend class="sr-only">Choose how you’d like to join us.</legend>
+      <label class="preference"><input type="checkbox" name="beta" value="1"><span><b>Request a beta invitation</b><small>Help test &amp; shape the platform</small></span></label>
+      <label class="preference"><input type="checkbox" name="newsletter" value="1"><span><b>Get the newsletter</b><small>Occasional updates &amp; launch news</small></span></label>
      </fieldset>
-     <div class="row"><div class="field grow"><label for="sub-email">Your email address</label><input id="sub-email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" required placeholder="you@example.com" maxlength="254"></div><button class="btn primary" type="submit">Join us <span aria-hidden="true">↗</span></button></div>
-     <label class="check"><input type="checkbox" name="consent" value="1"><span>I’m 18 or over and agree to emails for my selected preferences. <a href="#privacy" data-privacy>Privacy notice</a></span></label>
+     <div class="row"><div class="field grow"><label for="sub-email">Your email address</label><input id="sub-email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" required placeholder="you@example.com" maxlength="254"></div><button class="btn primary" type="submit">Send request <span aria-hidden="true">↗</span></button></div>
+     <label class="check"><input type="checkbox" name="consent" value="1"><span>I’m 18 or over and agree to emails for my selected preferences. <button type="button" class="link" data-privacy>Privacy notice</button></span></label>
      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
      <p class="msg" role="alert"></p>
-     <p id="signup-note" class="form-note">Choose either or both. Confirm by email. Unsubscribe any time.<br>Beta invitations follow separately when access is ready.</p>
+     <p id="signup-note" class="note">Confirm by email. Unsubscribe any time. Beta invitations follow separately when access is ready.</p>
     </form>
     <div class="done" id="sub-done" tabindex="-1" role="status"><span class="success-mark" aria-hidden="true">✓</span><h2>Check your inbox.</h2><p>We’ll email a confirmation link for new or changed preferences. If you’ve already confirmed these choices, you’re all set.</p><p id="signup-confirm-detail">Confirm your selected preferences using the link in your email.</p></div>
    </div>
-
 </div></dialog>
-<dialog id="contribute" class="dlg contribute-dialog" aria-labelledby="contribute-title"><button class="dlg-close floating-close" type="button" aria-label="Close" data-close>×</button> <section class="join-section"  aria-labelledby="contribute-title">
-  <div class="join-heading"><p class="eyebrow">GOOD PEOPLE. SHARED PURPOSE.</p><h2 id="contribute-title">There’s room for<br><em>what you bring.</em></h2><p>Help shape a more thoughtful cannabis community. We’re looking for volunteers with care, curiosity and a little time to give.</p><button class="join-action" type="button" data-role="">Find your place <span aria-hidden="true">↗</span></button><span class="volunteer-note">Volunteer roles · Flexible around your life</span></div>
+
+<!-- ============ DIALOG: Join the team (ways to contribute) ============ -->
+<dialog id="contribute" class="dlg contribute-dialog" aria-labelledby="contribute-title"><button class="dlg-close floating-close" type="button" aria-label="Close" data-close>×</button> <section class="join-section" aria-labelledby="contribute-title">
+  <div class="join-heading"><p class="eyebrow">Good people. Shared purpose.</p><h2 id="contribute-title">There’s room for<br><em>what you bring.</em></h2><p>Help shape a more thoughtful cannabis community. We’re looking for volunteers with care, curiosity and a little time to give.</p><button class="btn primary" type="button" data-role="">Find your place <span aria-hidden="true">↗</span></button><span class="volunteer-note">Volunteer roles · Flexible around your life</span></div>
   <div class="contributions" aria-label="Ways to contribute">
-   <p class="contributions-label">A FEW WAYS TO MAKE A DIFFERENCE</p>
-   <button type="button" data-role="moderator"><span class="role-index">01</span><span>Community & moderation<small>Make people feel welcome.</small></span><span aria-hidden="true">↗</span></button>
-   <button type="button" data-role="" data-area="Writing & clinical review"><span class="role-index">02</span><span>Writing & clinical review<small>Bring clarity to the conversation.</small></span><span aria-hidden="true">↗</span></button>
-   <button type="button" data-role="" data-area="Design & development"><span class="role-index">03</span><span>Design & development<small>Make useful things feel effortless.</small></span><span aria-hidden="true">↗</span></button>
+   <p class="contributions-label">A few ways to make a difference</p>
+   <button type="button" data-role="moderator"><span class="role-index">01</span><span>Community &amp; moderation<small>Make people feel welcome.</small></span><span aria-hidden="true">↗</span></button>
+   <button type="button" data-role="" data-area="Writing &amp; clinical review"><span class="role-index">02</span><span>Writing &amp; clinical review<small>Bring clarity to the conversation.</small></span><span aria-hidden="true">↗</span></button>
+   <button type="button" data-role="" data-area="Design &amp; development"><span class="role-index">03</span><span>Design &amp; development<small>Make useful things feel effortless.</small></span><span aria-hidden="true">↗</span></button>
    <p class="contributions-note">Something else to offer? <button type="button" data-role="other">We’d love to hear it.</button></p>
   </div>
  </section></dialog>
+
+<!-- ============ DIALOG: Application form ============ -->
 <dialog id="apply" class="dlg" aria-labelledby="apply-title">
   <div class="dlg-head"><h2 id="apply-title">Apply to join</h2><button class="dlg-close" type="button" aria-label="Close" data-close>×</button></div>
   <div class="dlg-body">
@@ -180,20 +188,21 @@
       </div>
       <label class="check">
         <input type="checkbox" name="consent" value="1">
-        <span>I'm 18 or over and agree to DopeHub keeping these details to review my application. <a href="#privacy" data-privacy>Privacy notice</a></span>
+        <span>I'm 18 or over and agree to DopeHub keeping these details to review my application. <button type="button" class="link" data-privacy>Privacy notice</button></span>
       </label>
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <p class="msg" role="alert" aria-live="assertive"></p>
       <div class="actions"><button class="btn primary" type="submit">Send application</button><button class="btn ghost" type="button" data-close>Cancel</button></div>
     </form>
     <div class="done" id="apply-done" tabindex="-1" role="status" aria-live="polite">
+      <span class="success-mark" aria-hidden="true">✓</span>
       <p class="done-title">Thanks, <span data-first-name>there</span>. We'll be in touch by email.</p>
       <div class="actions"><button class="btn primary" type="button" data-close>Close</button></div>
     </div>
   </div>
 </dialog>
 
-<!-- ============ DIALOG: Privacy (text copied word for word from the current page) ============ -->
+<!-- ============ DIALOG: Privacy ============ -->
 <dialog id="privacy" class="dlg" aria-labelledby="privacy-title">
   <div class="dlg-head"><h2 id="privacy-title">Privacy notice</h2><button class="dlg-close" type="button" aria-label="Close" data-close>×</button></div>
   <div class="dlg-body prose">
@@ -222,7 +231,6 @@
 
 <div class="banner" id="banner" role="status" aria-live="polite" hidden><b></b><span></span><button type="button" aria-label="Dismiss">×</button></div>
 <div class="toast" role="status" aria-live="polite"></div>
-
 
 <script src="/site.js" defer></script><script src="/app.js" defer></script>
 </body>

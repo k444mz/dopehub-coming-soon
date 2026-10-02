@@ -9,4 +9,6 @@ Coming-soon site for DopeHub.net: cinematic background loops, newsletter and bet
 - `guide1.pdf`, `guide2.pdf` the engineering and design guides the page follows.
 - `ComingSoonDopeHub.net*.zip` the earlier attempts, kept for reference.
 
+The countdown reads its launch moment from `data-launch` on the `.countdown` element in `site/index.html` (ISO 8601, UTC); change it there.
+
 Phones under 768px, reduced-motion and data-saver visitors get the still poster instead of the video. A Pause motion button is shown wherever video plays.
