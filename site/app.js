@@ -1,32 +1,22 @@
-/* Same-origin signup, confirmation, unsubscribe and volunteer applications. */
+/* Same-origin dialogs, volunteer applications, email confirmation, unsubscribe and the cookie-free visit count.
+   The updates and beta-invite forms on the page itself are handled in site.js. */
 (() => {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   $('#year').textContent = new Date().getFullYear();
   const openDlg = d => { if (!d.open) d.showModal(); };
-  $$('[data-signup]').forEach(b => b.addEventListener('click', () => openDlg($('#signup-dialog'))));
-  $$('[data-contribute]').forEach(b => b.addEventListener('click', () => openDlg($('#contribute'))));
   $$('dialog').forEach(d => {
     $$('[data-close]', d).forEach(b => b.addEventListener('click', () => d.close()));
-    d.addEventListener('click', e => { if (e.target === d && (e.clientX < d.getBoundingClientRect().left || e.clientX > d.getBoundingClientRect().right || e.clientY < d.getBoundingClientRect().top || e.clientY > d.getBoundingClientRect().bottom)) d.close(); });
+    d.addEventListener('click', e => {
+      if (e.target !== d) return;
+      const r = d.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+    });
   });
   $$('[data-privacy]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openDlg($('#privacy')); }));
-  const sub = $('#early-access'), email = $('#sub-email');
-  $$('[data-focus-email], [data-beta]').forEach(a => a.addEventListener('click', e => {
-    e.preventDefault();
-    if (a.hasAttribute('data-beta')) $('[name=beta]', sub).checked = true;
-    openDlg($('#signup-dialog'));
-    $('#signup').scrollIntoView({ behavior: reduce.matches ? 'instant' : 'smooth', block: 'center' });
-    if (!$('#sub-done').classList.contains('show')) email.focus({ preventScroll: true });
-    else $('#sub-done').focus({ preventScroll: true });
-  }));
-  $$('.botanical img').forEach(img => {
-    const fallback = () => document.documentElement.classList.add('lite');
-    img.addEventListener('error', fallback);
-    if (img.complete && !img.naturalWidth) fallback();
-  });
+
+  /* ---- Join the team: each role opens the application with that role chosen ---- */
   const roles = $('#ap-role');
   function hint() { $('#role-hint').textContent = roles.selectedOptions[0]?.dataset.hint || ''; }
   roles.addEventListener('change', hint);
@@ -36,6 +26,7 @@
     openDlg($('#apply'));
   }));
   $$('[data-count-for]').forEach(c => { const input = document.getElementById(c.dataset.countFor); const update = () => c.textContent = `${input.value.length} / ${input.maxLength}`; input.addEventListener('input', update); update(); });
+
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   async function send(url, data) {
     const ctrl = new AbortController(), timeout = setTimeout(() => ctrl.abort(), 12000);
@@ -58,17 +49,6 @@
       finally { button.disabled = false; button.innerHTML = label; form.removeAttribute('aria-busy'); }
     });
   }
-  wire(sub, $('#sub-done'), '/api/subscribe', fd => {
-    const address = (fd.get('email') || '').trim(), newsletter = !!fd.get('newsletter'), beta = !!fd.get('beta');
-    if (!newsletter && !beta) return { error: 'Choose the newsletter, a beta invitation, or both.', focus: $('[name=newsletter]', sub) };
-    if (!emailRe.test(address)) return { error: 'Please enter a valid email address.', focus: email };
-    if (!fd.get('consent')) return { error: 'Please confirm you’re 18 or over and agree to your selected emails.', focus: $('[name=consent]', sub) };
-    return { data: { email: address, newsletter, beta, consent: true, website: fd.get('website') || '' } };
-  }, data => {
-    $('#signup-confirm-detail').textContent = data.beta
-      ? (data.newsletter ? 'Your newsletter and beta choices stay separate. ' : '') + 'Confirm your beta request to join the waiting list. Your access invitation comes separately when it’s ready.'
-      : 'Confirm your newsletter subscription for occasional updates and launch news. You can unsubscribe at any time.';
-  });
   wire($('#apply-form'), $('#apply-done'), '/api/apply', fd => {
     const data = Object.fromEntries(fd); for (const k of ['name', 'email', 'link', 'message']) data[k] = (data[k] || '').trim();
     if (!data.name) return { error: 'Please tell us your name.', focus: $('#ap-name') };
@@ -80,6 +60,8 @@
     if (!data.consent) return { error: 'Please confirm you’re 18 or over and agree to the privacy notice.', focus: $('[name=consent]', $('#apply-form')) };
     data.consent = true; return { data };
   }, data => $('[data-first-name]').textContent = data.name.split(/\s+/)[0]);
+
+  /* ---- Links from emails: ?confirm=… and ?unsubscribe=… ---- */
   const banner = $('#banner');
   function notice(title, text, error = false) { $('b', banner).textContent = title; $('span', banner).textContent = text; banner.classList.toggle('err', error); banner.hidden = false; }
   $('button', banner).addEventListener('click', () => banner.hidden = true);
@@ -101,6 +83,8 @@
       finally { button.disabled = false; }
     });
   }
+
+  /* ---- Cookie-free visit count (skipped for Do Not Track / Global Privacy Control) ---- */
   try {
     if (!navigator.webdriver && navigator.doNotTrack !== '1' && window.doNotTrack !== '1' && !navigator.globalPrivacyControl) {
       let ref = ''; try { ref = document.referrer ? new URL(document.referrer).hostname : ''; } catch (_) {}
